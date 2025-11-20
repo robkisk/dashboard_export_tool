@@ -247,7 +247,7 @@ databricks sql warehouses list
 
 ## Scheduling Exports
 
-### Option 1: Databricks Jobs
+### Databricks Jobs
 
 Create a Databricks Job that runs this script on a schedule:
 
@@ -257,25 +257,37 @@ Create a Databricks Job that runs this script on a schedule:
 4. Configure cluster/warehouse
 5. Add script as task
 
-### Option 2: Cron (Linux/Mac)
+## Databricks Asset Bundles
 
-```bash
-# Edit crontab
-crontab -e
+[Databricks Asset Bundles](https://docs.databricks.com/aws/en/dev-tools/bundles/resources#dashboard) provide a structured way to deploy and manage dashboards alongside your export workflows.
 
-# Add entry (e.g., daily at 9 AM)
-0 9 * * * cd /path/to/dashboard_export_tool && uv run export_dashboard.py
+### Key Features
+
+- **Version Control**: Track dashboard definitions in Git alongside your export scripts
+- **CI/CD Integration**: Deploy dashboards programmatically as part of your deployment pipeline
+- **Environment Management**: Maintain separate dashboard configurations for dev, staging, and production
+- **Unified Deployment**: Bundle dashboards, jobs, and workflows together for consistent deployments
+
+### Using Asset Bundles with Dashboards
+
+Asset Bundles allow you to define dashboards in YAML configuration files and deploy them using the Databricks CLI:
+
+```yaml
+resources:
+  dashboards:
+    my_dashboard:
+      display_name: "Sales Dashboard"
+      warehouse_id: "${var.warehouse_id}"
+      file_path: "./dashboards/sales_dashboard.lvdash.json"
 ```
 
-### Option 3: Windows Task Scheduler
+This enables you to:
+- Version control your dashboard layouts and queries
+- Deploy dashboards automatically alongside scheduled export jobs
+- Maintain consistency across environments
+- Integrate dashboard management into your existing CI/CD workflows
 
-1. Open Task Scheduler
-2. Create Basic Task
-3. Set trigger (daily, weekly, etc.)
-4. Action: Start a program
-5. Program: `python`
-6. Arguments: `export_dashboard.py`
-7. Start in: `C:\path\to\dashboard_export_tool`
+For more information, see the [Databricks Asset Bundles documentation](https://docs.databricks.com/aws/en/dev-tools/bundles/resources#dashboard).
 
 ## Output
 
