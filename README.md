@@ -15,21 +15,42 @@ Export large dashboard tables from Databricks AI/BI Dashboards, convert them to 
 ## Prerequisites
 
 - Python 3.8 or higher
+- [uv](https://docs.astral.sh/uv/) - Fast Python package installer and resolver
 - Databricks workspace with SQL Warehouse
 - SMTP email account (Gmail, Outlook, Office365, or custom)
 - Databricks authentication (token or OAuth)
 
 ## Installation
 
+### Install uv (if not already installed)
+
+```bash
+# macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# Or with pip
+pip install uv
+```
+
+### Setup Project
+
 1. Navigate to the project directory:
 ```bash
 cd dashboard_export_tool
 ```
 
-2. Install dependencies:
+2. Sync dependencies with uv:
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
+
+This will:
+- Create a virtual environment automatically
+- Install all dependencies from `pyproject.toml`
+- Generate a `uv.lock` file for reproducible installs
 
 3. Configure Databricks authentication:
 
@@ -123,6 +144,16 @@ TITLE = 'AI/BI Dashboard Export'
 
 Run the script:
 ```bash
+uv run export_dashboard.py
+```
+
+Or activate the virtual environment first:
+```bash
+# Activate the environment
+source .venv/bin/activate  # macOS/Linux
+# .venv\Scripts\activate   # Windows
+
+# Then run normally
 python export_dashboard.py
 ```
 
@@ -233,7 +264,7 @@ Create a Databricks Job that runs this script on a schedule:
 crontab -e
 
 # Add entry (e.g., daily at 9 AM)
-0 9 * * * cd /path/to/dashboard_export_tool && python export_dashboard.py
+0 9 * * * cd /path/to/dashboard_export_tool && uv run export_dashboard.py
 ```
 
 ### Option 3: Windows Task Scheduler
@@ -324,10 +355,14 @@ statement = self.w.statement_execution.execute_statement(
 dashboard_export_tool/
 ├── export_dashboard.py   # Main script
 ├── config.py            # Configuration management
-├── requirements.txt     # Python dependencies
+├── example_usage.py     # Example usage scripts
+├── pyproject.toml       # Project metadata and dependencies
+├── uv.lock             # Lockfile for reproducible installs
 ├── .env.example        # Example environment file
 ├── .env               # Your actual config (git-ignored)
+├── .gitignore          # Git ignore rules
 ├── README.md          # This file
+├── .venv/             # Virtual environment (created by uv)
 └── exports/           # Output directory for PDFs
 ```
 
@@ -425,6 +460,47 @@ This project is provided as-is for use with Databricks SDK.
 For issues related to:
 - **Databricks SDK**: https://github.com/databricks/databricks-sdk-py/issues
 - **This script**: Check troubleshooting section above
+
+## Development
+
+### Installing Development Dependencies
+
+```bash
+# Install with dev dependencies
+uv sync --all-extras
+
+# Or just dev dependencies
+uv sync --extra dev
+```
+
+### Running Tests
+
+```bash
+uv run pytest
+```
+
+### Code Formatting
+
+```bash
+# Format with black
+uv run black .
+
+# Lint with ruff
+uv run ruff check .
+```
+
+### Adding Dependencies
+
+```bash
+# Add a new dependency
+uv add package-name
+
+# Add a dev dependency
+uv add --dev package-name
+
+# Add to a specific optional group
+uv add --optional email-providers sendgrid
+```
 
 ## Contributing
 
